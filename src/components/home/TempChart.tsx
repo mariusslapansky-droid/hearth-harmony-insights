@@ -1,7 +1,7 @@
 import { Area, CartesianGrid, ComposedChart, Line, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { fmt, rooms, type Range } from "@/lib/demo-data";
+import { fmt, rooms, type Range, type Point } from "@/lib/demo-data";
 
-type P = Record<string, number>;
+type P = Point;
 
 function tick(range: Range) {
   return (t: number) => {
@@ -16,7 +16,7 @@ function heatBands(data: P[]) {
   const out: [number, number][] = [];
   data.forEach((p, i) => {
     if (!p.heating) return;
-    const next = data[i + 1]?.t ?? p.t;
+    const next: number = data[i + 1]?.t ?? p.t;
     const last = out[out.length - 1];
     if (last && last[1] === p.t) last[1] = next; else out.push([p.t, next]);
   });

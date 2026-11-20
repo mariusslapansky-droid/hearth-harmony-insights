@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span className="grid size-9 shrink-0 place-items-center rounded-full bg-gradient-heat text-primary-foreground shadow-heat">
             <Flame className="size-4" />
           </span>
-          <span className="truncate font-display text-lg font-semibold">Imou Home</span>
+          <span className="truncate font-display text-lg font-semibold">Monitorizare casă</span>
         </Link>
         <nav className="hidden items-center gap-1 rounded-full bg-secondary/60 p-1 md:flex">
           {nav.map((n) => {

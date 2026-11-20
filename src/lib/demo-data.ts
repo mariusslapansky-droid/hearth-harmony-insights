@@ -19,10 +19,13 @@ export const ranges: { id: Range; label: string; hours: number; step: number }[]
 // Deterministic pseudo-random so SSR and client match
 function rnd(seed: number) { const x = Math.sin(seed * 9301 + 49297) * 233280; return x - Math.floor(x); }
 
-export function series(range: Range) {
+export type Point = { t: number; heating: number; setpoint: number; [k: string]: number };
+export const val = (p: Point, k: string) => p[k] ?? 0;
+
+export function series(range: Range): Point[] {
   const r = ranges.find((x) => x.id === range)!;
   const end = new Date("2026-11-19T20:30:00").getTime();
-  const pts = [] as Array<Record<string, number>>;
+  const pts: Point[] = [];
   const n = Math.round(r.hours / r.step);
   for (let i = n; i >= 0; i--) {
     const t = end - i * r.step * 3600e3;
@@ -30,14 +33,13 @@ export function series(range: Range) {
     const day = Math.sin(((h - 9) / 24) * Math.PI * 2);
     const season = range === "1a" ? Math.cos(((n - i) / n) * Math.PI * 2) * 8 : 0;
     const heating = (h > 6.5 && h < 7.5) || (h > 17 && h < 22) ? 1 : 0;
-    const p: Record<string, number> = { t, heating };
+    const p: Point = { t, heating, setpoint: heating ? 23 : 21 };
     rooms.forEach((room, k) => {
       const noise = (rnd(i * 7 + k) - 0.5) * 0.6;
       if (room.exterior) p[room.id] = +(room.temp + day * 4 - season + noise * 2).toFixed(1);
       else p[room.id] = +(room.temp + day * 0.8 + heating * 0.6 + noise).toFixed(1);
       if (room.humidity != null) p[room.id + "_h"] = +(room.humidity + day * -4 + noise * 6).toFixed(1);
     });
-    p.setpoint = heating ? 23 : 21;
     pts.push(p);
   }
   return pts;
